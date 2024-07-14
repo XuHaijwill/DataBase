@@ -1,0 +1,147 @@
+# isql 登录本地和远程sybase 数据库
+## 1.登录本地数据库
+
+```
+isql -U username -P password
+#isql -U 用户名 -P 密码
+```
+
+## 2.登录远程数据库
+
+```
+isql -U username -P password -H IP:PORT -D DATABASE -S SERVER
+#isql -U 用户名 -P 密码 -H 远程数据库IP:端口 -D 数据库 -S 服务名
+#此处的SERVER 是sybase dsedit utility中配置的serverName, 通过select @@serverName 查询
+
+#isql -U username -P password -H ip:port -D database -S serverName -w300 -s$$
+```
+
+## 3.isql常用命令
+
+## developer
+```
+sp_who go -- 查看所有登录用户状态
+sp_who 用户名 go -- 查看某登录用户状态
+sp_helpuser go -- 查看数据库信息
+sp_helpserver go -- 查看服务名
+sp_helpdb go ---查看所有数据库的信息
+use pubs2 go --使用pubs2数据库
+sp_help go --查看当前数据库中的所有表
+sp_help tablename go--查表结构
+
+sp_helpindex tablename go --查看表索引
+sp_helpdb master go--查看某个数据库信息，如master
+sp_lock go--查看锁信息
+select @@version go -- 查看sybase版本
+sp_version go -- 查看sybase版本
+```
+
+
+## DBA
+
+```
+sp_dropuser username go -- 删除数据库用户
+sp_locklogin aifusenyu,’lock/unlock’ go -- 锁定或者解除锁定用户
+sp_locklogin go -- 查看当前锁定用户列表
+sp_displaylogin [loginname] go -- 查看登录用户列表
+drop database testdb go -- 删除数据库
+sp_dropdevice ‘testdb’go---删除数据库设备
+sp_addgroup grpname go -- 创建用户组
+sp_helpgroup /grouname go -- 查看用户组信息
+sp_adduser loginname[,name_in_db[,grpname]] go -- 创建数据库用户
+sp_changedbowner ‘loginname’go -- 改变数据库的属主用户。
+sp_changegroup groupname,name_in_db go -- 将用户移除此组
+sp_dropgroup groupname go -- 删除用户组
+sp_dropuser username go -- 删除数据库用户
+```
+
+
+## Other
+
+```
+sp_helpdevice go---查看所有设备信息
+sp_helpdevice devicename go--查看某个设备信息
+sp_helpsort go--查看服务器的字符集和排序顺序
+sp_displaylogin username go--查看某用户的信息
+sp_who go--查看连接的服务器进程信息或者sp_who username go
+sp_password null,lonton go -- 设置sa用户的口令（ASE初始密码为空）
+sp_helpdevice go -- —查看sybase的数据设备信息
+select name,phyname,vdevno,low from master..sysdevices where name=’master’ go
+sp_helpsort go -- 查看系统的默认排序方式、字符集和主要的排序顺序表
+select name,id from syscharsets go -- 查看系统字符集的安装状态
+Sp_configure “default char”go -- 查看当前使用的缺省字符集
+startserver –f servername  -- 启动sybase数据库服务
+```
+
+## 4.isql 命令的参数详解：
+
+``` shell
+usage: isql [-b] [-e] [-F] [-p] [-n] [-v] [-X] [-Y] [-Q]
+[-a display_charset] [-A packet_size] [-c cmdend] [-D database]
+[-E editor [-h header [-H hostname [-i inputfile]
+[-I interfaces_file] [-J client_charset] [-K keytab_file]
+[-l login_timeout] [-m errorlevel] [-M labelname labelvalue]
+[-o outputfile] [-P password] [-R remote_server_principal]
+[-s col_separator] [-S server_name] [-t timeout] [-U username]
+[-V [security_options]] [-w column_width] [-z localename]
+[-Z security_mechanism]
+```
+
+```
+sybase bcp 命令
+bcp 参数详解及举例
+bcp是Sybase ASE 的命令行工具，用于导入和导出数据。以下是一些常用的bcp参数：
+
+-f：指定格式文件。格式文件定义了数据的布局和数据类型。例如：
+
+bcp database.dbo.table in input.txt -f formatfile.fmt
+-c：指定列分隔符。例如，使用逗号作为列分隔符：
+
+bcp database.dbo.table in input.txt -c
+-t：指定字段分隔符。例如，使用制表符作为字段分隔符：
+
+bcp database.dbo.table in input.txt -t
+-r：指定行分隔符。例如，使用换行符作为行分隔符：
+
+bcp database.dbo.table in input.txt -r
+-S：指定服务器名称。例如：
+
+bcp database.dbo.table in input.txt -S localhost
+-U：指定用户名。例如：
+
+bcp database.dbo.table in input.txt -U sa
+-P：指定密码。例如：
+
+bcp database.dbo.table in input.txt -P password
+-d：指定数据库名称。例如：
+
+bcp database.dbo.table in input.txt -d database
+-T：使用Trusted Connection，即Windows身份验证。例如：
+
+bcp database.dbo.table in input.txt -T
+-b：指定每次批量插入的行数。例如：
+
+bcp database.dbo.table in input.txt -b 1000
+以上就是一些常用的bcp参数，具体使用时可以参考Microsoft的官方文档。
+
+sybase bcp -m -n参数详解
+bcp命令中的-m和-n参数是用来指定导出数据的格式的。
+
+-m：指定导出数据的格式为MASS_FORMAT。这种格式适用于导出大量数据，它可以提高导出速度并减少导出文件的大小。例如：
+
+bcp database.dbo.table out output.txt -m
+在这个命令中，database.dbo.table是你要导出的表，output.txt是输出文件的名称，-m参数表示导出数据的格式为MASS_FORMAT。
+
+-n：指定导出数据的格式为NORMAL_FORMAT。这种格式适用于导出少量数据，它可以提高导出精度并增加导出文件的可读性。例如：
+
+bcp database.dbo.table out output.txt -n
+在这个命令中，database.dbo.table是你要导出的表，output.txt是输出文件的名称，-n参数表示导出数据的格式为NORMAL_FORMAT。
+
+注意：-m和-n参数通常在需要导出大量数据或需要提高导出精度时使用。在大多数情况下，-m参数是默认的导出格式，而-n参数通常用于导出少量数据或需要提高导出精度的场景。
+
+1.将数据库中的表导出到文件中
+bcp pubs2..authors out c:\authors.txt -U sa -P password -c
+2.将文件中的数据导入到数据库中：
+bcp pubs2..authors in c:\authors.txt -U sa -P password -c
+```
+
